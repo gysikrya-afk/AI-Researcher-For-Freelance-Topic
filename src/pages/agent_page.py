@@ -1,0 +1,56 @@
+import streamlit as st
+
+from src.config import streat_text_how_work_agent
+from src.agents import run_agent_gemini
+
+st.set_page_config(
+    page_title="Агент | AI Freelance Agent", page_icon="🦾", layout="centered"
+)
+
+st.title("Агент🦾")
+
+if "api_key" not in st.session_state:
+    st.session_state.api_key = ""
+if "models" not in st.session_state:
+    st.session_state.models = "gemini-2.5-flash"
+
+st.markdown(
+    """
+    На этой страничке есть агент для **аналитики** и **иследования** тем на фрилансе.
+    Если нужна помощь нажмите на кнопку **Помощь**.
+    """
+)
+st.divider()
+
+if st.button("Помощь"):
+    st.write_stream(streat_text_how_work_agent())
+
+st.divider()
+
+topic = st.chat_input("Введите тему для анализа (например, Дизайн интерфейсов)")
+
+if topic:
+    try:
+        if not st.session_state.api_key:
+            st.error("Введите Gemini API Key в Настройках")
+
+        else:
+            with st.chat_message("user"):
+                st.write(topic)
+
+            with st.chat_message("assistant"):
+                st.write("Начинаю анализ рынка по вашей теме...")
+
+                result = run_agent_gemini(
+                    api_key=st.session_state.api_key,
+                    model=st.session_state.models,
+                    topic=topic,
+                )
+
+                st.markdown(result)
+
+    except Exception as e:
+        st.error("Ошибка!")
+        st.exception(e)
+
+st.caption('Помните,ИИ может ошибаться,тож проверяйте информацию!')
