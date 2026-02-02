@@ -2,6 +2,7 @@ import streamlit as st
 
 from src.config import streat_text_how_work_agent
 from src.agents import run_agent_gemini
+from src.files import create_docx
 
 st.set_page_config(
     page_title="Агент | AI Freelance Agent", page_icon="🦾", layout="centered"
@@ -49,8 +50,28 @@ if topic:
 
                 st.markdown(result)
 
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.download_button(
+                        label='Скачать результат(Формат .md)',
+                        data=result,
+                        file_name='freelance_analysis.md',
+                        mime='text/markdown'                       
+                        )
+                
+                with col2:
+                    result_docx = create_docx(result)
+                    st.download_button(
+                        label='Скачать результат(Формат .docx)',
+                        data=result_docx,
+                        file_name='freelance_analysis.docx',
+                        mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'                       
+                        )
+
     except Exception as e:
         st.error("Ошибка!")
         st.exception(e)
+
 
 st.caption('Помните,ИИ может ошибаться,тож проверяйте информацию!')
